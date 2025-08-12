@@ -517,6 +517,191 @@ body {
     color: #cbd5e1;
 }
 
+/* Analysis Output Section */
+.analysis-output {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-radius: var(--border-radius);
+    border: 1px solid #bae6fd;
+}
+
+.analysis-output h3 {
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.analysis-summary {
+    margin-bottom: 2rem;
+}
+
+.analysis-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.analysis-item:last-child {
+    margin-bottom: 0;
+}
+
+.analysis-icon {
+    font-size: 1.5rem;
+    min-width: 40px;
+}
+
+.analysis-item strong {
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+}
+
+.analysis-item p {
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.analysis-trigger {
+    font-size: 1.1rem;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--shadow-md);
+}
+
+.analysis-trigger:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Typeform Modal */
+.typeform-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.typeform-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.typeform-overlay {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.typeform-container {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    height: 80vh;
+    background: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.typeform-modal.active .typeform-container {
+    transform: scale(1);
+}
+
+.close-typeform {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 10001;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.close-typeform:hover {
+    background: rgba(0, 0, 0, 0.9);
+    transform: scale(1.1);
+}
+
+.typeform-content {
+    width: 100%;
+    height: 100%;
+}
+
+.typeform-content iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Responsive aanpassingen voor Typeform */
+@media (max-width: 768px) {
+    .typeform-container {
+        height: 90vh;
+        max-width: 95%;
+    }
+    
+    .analysis-output {
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+    
+    .analysis-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+    }
+    
+    .analysis-trigger {
+        width: 100%;
+        padding: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .typeform-overlay {
+        padding: 10px;
+    }
+    
+    .typeform-container {
+        height: 95vh;
+    }
+    
+    .analysis-output h3 {
+        font-size: 1.25rem;
+    }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .nav-links {

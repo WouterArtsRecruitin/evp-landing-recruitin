@@ -299,4 +299,150 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 0);
         });
     }
+
+    // Typeform Integration
+    const typeformTrigger = document.getElementById('typeformTrigger');
+    const typeformModal = document.getElementById('typeformModal');
+    const closeTypeform = document.getElementById('closeTypeform');
+    let typeformScriptLoaded = false;
+
+    function loadTypeformScript() {
+        if (typeformScriptLoaded) return Promise.resolve();
+        
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = '//embed.typeform.com/next/embed.js';
+            script.async = true;
+            script.onload = () => {
+                typeformScriptLoaded = true;
+                resolve();
+            };
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
+    }
+
+    function openTypeform() {
+        if (typeformModal) {
+            // Load Typeform script eerst
+            loadTypeformScript().then(() => {
+                typeformModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                
+                // Track event voor analytics
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'typeform_opened', {
+                        'custom_parameter': 'vacature_verbetering',
+                        'page_title': document.title
+                    });
+                }
+                
+                // Focus management voor accessibility
+                setTimeout(() => {
+                    const typeformIframe = typeformModal.querySelector('iframe');
+                    if (typeformIframe) {
+                        typeformIframe.focus();
+                    }
+                }, 300);
+            }).catch(error => {
+                console.error('Fout bij laden Typeform script:', error);
+                showNotification('Formulier kon niet worden geladen. Probeer het opnieuw.', 'error');
+            });
+        }
+    }
+
+    function closeTypeformModal() {
+        if (typeformModal) {
+            typeformModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            
+            // Track close event
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'typeform_closed', {
+                    'custom_parameter': 'vacature_verbetering'
+                });
+            }
+        }
+    }
+
+    // Event listeners voor Typeform
+    if (typeformTrigger && typeformModal) {
+        // Open Typeform bij button click
+        typeformTrigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            openTypeform();
+        });
+        
+        // Sluit Typeform bij close button
+        if (closeTypeform) {
+            closeTypeform.addEventListener('click', function(e) {
+                e.preventDefault();
+                closeTypeformModal();
+            });
+        }
+        
+        // Sluit bij klik op overlay (buiten container)
+        typeformModal.addEventListener('click', function(e) {
+            if (e.target === typeformModal || e.target.classList.contains('typeform-overlay')) {
+                closeTypeformModal();
+            }
+        });
+        
+        // Sluit bij Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && typeformModal.classList.contains('active')) {
+                closeTypeformModal();
+            }
+        });
+
+        // Preload Typeform script on hover voor betere UX
+        typeformTrigger.addEventListener('mouseenter', function() {
+            loadTypeformScript().catch(error => {
+                console.warn('Preload Typeform script gefaald:', error);
+            });
+        });
+    }
+
+    // Enhanced Analytics voor Typeform integratie
+    function trackTypeformInteraction(action, details = {}) {
+        // Google Analytics 4
+        if (typeof gtag !== 'undefined') {
+            gtag('event', action, {
+                event_category: 'Typeform',
+                event_label: 'Vacature Verbetering',
+                ...details
+            });
+        }
+        
+        // Console logging voor debugging
+        console.log('Typeform Event:', action, details);
+    }
+
+    // Listen voor Typeform events (als ze beschikbaar zijn)
+    window.addEventListener('message', function(event) {
+        if (event.origin === 'https://form.typeform.com') {
+            const data = event.data;
+            
+            switch (data.type) {
+                case 'form_ready':
+                    trackTypeformInteraction('form_ready');
+                    break;
+                case 'form_submit':
+                    trackTypeformInteraction('form_submit', {
+                        form_id: '01K25SKWYTKZ05DAHER9D52J94'
+                    });
+                    // Toon succes bericht
+                    setTimeout(() => {
+                        closeTypeformModal();
+                        showNotification('Bedankt voor je interesse! We nemen snel contact met je op.', 'success');
+                    }, 2000);
+                    break;
+                case 'form_screen_changed':
+                    trackTypeformInteraction('form_progress', {
+                        screen: data.screen
+                    });
+                    break;
+            }
+        }
+    });
 });
