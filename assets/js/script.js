@@ -56,9 +56,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const formData = new FormData(this);
             const data = Object.fromEntries(formData.entries());
             
-            // Basic validation
+            // Enhanced validation
             if (!data.name || !data.email || !data.position) {
                 showNotification('Vul alle verplichte velden in.', 'error');
+                return;
+            }
+            
+            if (!data.privacy) {
+                showNotification('Je moet akkoord gaan met de privacyverklaring.', 'error');
                 return;
             }
             
@@ -66,6 +71,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 showNotification('Voer een geldig email adres in.', 'error');
                 return;
             }
+            
+            // Sanitize inputs
+            data.name = sanitizeInput(data.name);
+            data.message = sanitizeInput(data.message);
             
             // Simulate form submission
             const submitButton = this.querySelector('button[type="submit"]');
@@ -99,10 +108,21 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Email validation
+    // Email validation - improved regex
     function isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
+        const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+        return emailRegex.test(email) && email.length <= 254;
+    }
+    
+    // Input sanitization
+    function sanitizeInput(input) {
+        if (typeof input !== 'string') return input;
+        
+        return input
+            .trim()
+            .replace(/[<>]/g, '') // Remove potential HTML tags
+            .replace(/javascript:/gi, '') // Remove javascript: protocol
+            .substring(0, 1000); // Limit length
     }
 
     // Notification system
@@ -310,45 +330,88 @@ document.addEventListener('DOMContentLoaded', function() {
         if (typeformScriptLoaded) return Promise.resolve();
         
         return new Promise((resolve, reject) => {
+            // Check if script is already being loaded
+            const existingScript = document.querySelector('script[src*="embed.typeform.com"]');
+            if (existingScript) {
+                existingScript.onload = () => {
+                    typeformScriptLoaded = true;
+                    resolve();
+                };
+                return;
+            }
+            
             const script = document.createElement('script');
-            script.src = '//embed.typeform.com/next/embed.js';
+            script.src = 'https://embed.typeform.com/next/embed.js';
             script.async = true;
+            script.crossOrigin = 'anonymous';
             script.onload = () => {
                 typeformScriptLoaded = true;
                 resolve();
             };
-            script.onerror = reject;
+            script.onerror = (error) => {
+                console.error('Failed to load Typeform script:', error);
+                reject(new Error('Typeform script loading failed'));
+            };
             document.head.appendChild(script);
         });
     }
 
     function openTypeform() {
-        if (typeformModal) {
-            // Load Typeform script eerst
-            loadTypeformScript().then(() => {
-                typeformModal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-                
-                // Track event voor analytics
-                if (typeof gtag !== 'undefined') {
-                    gtag('event', 'typeform_opened', {
-                        'custom_parameter': 'vacature_verbetering',
-                        'page_title': document.title
-                    });
-                }
-                
-                // Focus management voor accessibility
-                setTimeout(() => {
-                    const typeformIframe = typeformModal.querySelector('iframe');
-                    if (typeformIframe) {
-                        typeformIframe.focus();
-                    }
-                }, 300);
-            }).catch(error => {
-                console.error('Fout bij laden Typeform script:', error);
-                showNotification('Formulier kon niet worden geladen. Probeer het opnieuw.', 'error');
-            });
+        if (!typeformModal) return;
+        
+        // Disable trigger button to prevent multiple clicks
+        if (typeformTrigger) {
+            typeformTrigger.disabled = true;
+            typeformTrigger.textContent = 'Formulier laden...';
         }
+        
+        // Load Typeform script eerst
+        loadTypeformScript().then(() => {
+            typeformModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Initialize Typeform embed if not already done
+            const typeformContainer = typeformModal.querySelector('[data-tf-live]');
+            if (typeformContainer && window.tf) {
+                // Ensure Typeform is properly initialized
+                window.tf.load();
+            }
+            
+            // Track event voor analytics
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'typeform_opened', {
+                    'custom_parameter': 'vacature_verbetering',
+                    'page_title': document.title
+                });
+            }
+            
+            // Focus management voor accessibility
+            setTimeout(() => {
+                const typeformIframe = typeformModal.querySelector('iframe');
+                if (typeformIframe) {
+                    typeformIframe.focus();
+                } else {
+                    // Fallback: focus close button
+                    closeTypeform?.focus();
+                }
+            }, 500);
+            
+            // Re-enable trigger button
+            if (typeformTrigger) {
+                typeformTrigger.disabled = false;
+                typeformTrigger.textContent = '🎯 Interesse in je verbeterde vacaturetekst?';
+            }
+            
+        }).catch(error => {
+            console.error('Fout bij laden Typeform script:', error);
+            showNotification('Formulier kon niet worden geladen. Probeer het opnieuw.', 'error');
+            
+            // Re-enable trigger button on error
+            if (typeformTrigger) {
+                typeformTrigger.disabled = false;
+                typeformTrigger.textContent = '🎯 Interesse in je verbeterde vacaturetekst?';
+            }
+        });
     }
 
     function closeTypeformModal() {

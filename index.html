@@ -7,14 +7,59 @@
     <meta name="description" content="Ontdek waarom Recruitin.nl de perfecte plek is voor jouw recruitment carrière. Join ons team van recruitment professionals.">
     <meta name="keywords" content="recruitment jobs, werken bij recruitin, recruitment carrière, vacatures recruitment">
     
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    
+    <!-- Performance Hints -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="//embed.typeform.com">
+    
     <!-- Open Graph -->
     <meta property="og:title" content="Werken bij Recruitin.nl - Jouw Recruitment Carrière">
     <meta property="og:description" content="Ontdek waarom Recruitin.nl de perfecte plek is voor jouw recruitment carrière.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://evp-recruitin-landing.netlify.app">
     
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Critical CSS inlined for performance -->
+    <style>
+        /* Critical above-the-fold styles */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --background-white: #ffffff;
+            --background-light: #f8fafc;
+        }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6; 
+            color: var(--text-primary);
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .hero {
+            padding: 8rem 2rem 6rem;
+            background: linear-gradient(135deg, var(--background-light) 0%, var(--background-white) 100%);
+            min-height: 90vh;
+        }
+    </style>
+    <link rel="preload" href="assets/css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="assets/css/style.css"></noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 </head>
 <body>
     <!-- Header -->
@@ -238,13 +283,16 @@
                 <div class="contact-form">
                     <form id="applicationForm" class="form">
                         <div class="form-group">
-                            <input type="text" id="name" name="name" placeholder="Volledige naam" required>
+                            <label for="name" class="sr-only">Volledige naam</label>
+                            <input type="text" id="name" name="name" placeholder="Volledige naam" required aria-describedby="name-help">
                         </div>
                         <div class="form-group">
-                            <input type="email" id="email" name="email" placeholder="Email adres" required>
+                            <label for="email" class="sr-only">Email adres</label>
+                            <input type="email" id="email" name="email" placeholder="Email adres" required aria-describedby="email-help">
                         </div>
                         <div class="form-group">
-                            <input type="tel" id="phone" name="phone" placeholder="Telefoonnummer">
+                            <label for="phone" class="sr-only">Telefoonnummer</label>
+                            <input type="tel" id="phone" name="phone" placeholder="Telefoonnummer" aria-describedby="phone-help">
                         </div>
                         <div class="form-group">
                             <select id="position" name="position" required>
@@ -257,6 +305,13 @@
                         </div>
                         <div class="form-group">
                             <textarea id="message" name="message" placeholder="Vertel ons over jezelf en waarom je bij Recruitin.nl wilt werken..." rows="5"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="privacy-consent">
+                                <input type="checkbox" id="privacy" name="privacy" required>
+                                <span class="checkmark"></span>
+                                Ik ga akkoord met de <a href="#" target="_blank">privacyverklaring</a> en het verwerken van mijn gegevens voor recruitment doeleinden.
+                            </label>
                         </div>
                         <button type="submit" class="btn-primary full-width">Verstuur Sollicitatie</button>
                     </form>
@@ -271,7 +326,11 @@
             <div class="typeform-container">
                 <button id="closeTypeform" class="close-typeform" aria-label="Sluit formulier">&times;</button>
                 <div class="typeform-content">
-                    <div data-tf-live="01K25SKWYTKZ05DAHER9D52J94"></div>
+                    <div data-tf-live="01K25SKWYTKZ05DAHER9D52J94" 
+                         data-tf-opacity="0"
+                         data-tf-iframe-props="title=Vacature Verbetering Formulier"
+                         data-tf-transitive-search-params
+                         data-tf-auto-focus></div>
                 </div>
             </div>
         </div>
